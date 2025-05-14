@@ -136,42 +136,9 @@ class CNNWithEntropyAttention(nn.Module):
         x = torch.cat([x, ent], dim=1)
         x = F.relu(self.fc1(x))
         return self.fc2(x)
-    
-class CNN_NoEntropy(nn.Module):
-    def __init__(self):
-        super(CNN_NoEntropy, self).__init__()
-        self.conv1 = nn.Conv1d(1, 16, kernel_size=7, padding=3)
-        self.conv2 = nn.Conv1d(16, 32, kernel_size=5, padding=2)
-        self.pool = nn.AdaptiveAvgPool1d(1)
-        self.fc1 = nn.Linear(32, 32)
-        self.fc2 = nn.Linear(32, 10)
-
-    def forward(self, x, ent=None):
-        x = F.relu(self.conv1(x))
-        x = F.relu(self.conv2(x))
-        x = self.pool(x).squeeze(-1)
-        x = F.relu(self.fc1(x))
-        return self.fc2(x)
-    
-class CNN_NoAttention(nn.Module):
-    def __init__(self):
-        super(CNN_NoAttention, self).__init__()
-        self.conv1 = nn.Conv1d(1, 16, kernel_size=7, padding=3)
-        self.conv2 = nn.Conv1d(16, 32, kernel_size=5, padding=2)
-        self.pool = nn.AdaptiveAvgPool1d(1)
-        self.fc1 = nn.Linear(32 + 4, 32)
-        self.fc2 = nn.Linear(32, 10)
-
-    def forward(self, x, ent):
-        x = F.relu(self.conv1(x))
-        x = F.relu(self.conv2(x))
-        x = self.pool(x).squeeze(-1)
-        x = torch.cat([x, ent], dim=1)
-        x = F.relu(self.fc1(x))
-        return self.fc2(x)
 
 
-model = CNN_NoAttention().to(device)
+model = CNNWithEntropyAttention().to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
